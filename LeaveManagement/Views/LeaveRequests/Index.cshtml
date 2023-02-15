@@ -1,0 +1,129 @@
+﻿@model AdminLeaveRequestViewModel
+
+@{
+    ViewData["Title"] = "Admin View Leave Requests";
+}
+
+<h1>Admin Leave Requests Overview </h1>
+
+<div class="row">
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-primary">@Model.TotalRequests</h5>
+                <p class="card-text">@Html.DisplayNameFor(model => model.TotalRequests)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-warning">@Model.PendingRequests</h5>
+                <p class="card-text">@Html.DisplayNameFor(model => model.PendingRequests)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-success">@Model.ApprovedRequests</h5>
+                <p class="card-text">@Html.DisplayNameFor(model => model.ApprovedRequests)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-danger">@Model.RejectedRequests</h5>
+                <p class="card-text">@Html.DisplayNameFor(model => model.RejectedRequests)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+<h4>Leave Request Log</h4>
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].Employee)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].DateRequested)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].LeaveType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.LeaveRequests[0].Approved)
+            </th>
+            <th></th> <!-- Empty Tag is needed or DataTables will give Error!-->
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.LeaveRequests) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.FirstName) @Html.DisplayFor(modelItem => item.Employee.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateRequested)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LeaveType.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+            <td>
+                @if (item.Cancelled)
+                {
+                    <span class="badge bg-secondary">Cancelled</span>
+                }
+                else if (item.Approved == true)
+                {
+                    <span class="badge bg-success">Approved</span>
+                }
+                else if (item.Approved == false)
+                {
+                    <span class="badge bg-danger">Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning">Pending</span>
+                }
+            </td>
+            <td>
+                @if(item.Cancelled == false)
+                {
+                    <a asp-action="Details" class="btn btn-primary btn-sms" asp-route-id="@item.Id">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                        </svg>
+                    </a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<a class="btn btn-dark btn-sm" asp-controller="Home" asp-action="Index">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-backspace" viewBox="0 0 16 16">
+        <path d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z" />
+        <path d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-7.08z" />
+    </svg>
+</a>

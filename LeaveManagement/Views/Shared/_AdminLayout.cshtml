@@ -1,0 +1,346 @@
+﻿@using LeaveManagement.Repository;
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims;
+
+<!-- --------INJECTING RAZOR-PAGE-------- -->
+@inject SignInManager<Employee> SignInManager
+@inject UserManager<Employee> UserManager
+
+@{
+    <!DOCTYPE html>
+    <html dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="keywords"
+              content="leave management system, asp.net, mvc, .net core 77 ">
+        <meta name="description"
+              content="ASP.NET Core 7 MVC w/ Entity Framework Development">
+        <meta name="robots" content="noindex,nofollow">
+
+        <title>@ViewData["Title"] Leave Management System</title>
+        
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="~/css/style.min.css" asp-append-version="true" />
+
+        <!-- Custom CSS -->
+        <link href="~/css/style.min.css" rel="stylesheet">
+        
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+
+    <body>
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+        <div class="preloader">
+            <div class="lds-ripple">
+                <div class="lds-pos"></div>
+                <div class="lds-pos"></div>
+            </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- Main wrapper - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+             data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+            <!-- ============================================================== -->
+            <!-- Topbar header - style you can find in pages.scss -->
+            <!-- ============================================================== -->
+            <header class="topbar" data-navbarbg="skin5">
+                <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+                    <div class="navbar-header" data-logobg="skin5">
+                        <!-- ============================================================== -->
+                        <!-- Logo -->
+                        <!-- ============================================================== -->
+                        <a class="navbar-brand" href="index.html">
+                            <!-- Logo icon -->
+                            <b class="logo-icon">
+                                
+                            </b>
+                            <!--End Logo icon -->
+                            <!-- Logo text -->
+                            <span class="logo-text">
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="" asp-action="">LeaveManagement</a>
+                            </span>
+                        </a>
+                        <!-- ============================================================== -->
+                        <!-- End Logo -->
+                        <!-- ============================================================== -->
+                        <!-- This is for the sidebar toggle which is visible on mobile only -->
+                        <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
+                            <i class="ti-menu ti-close"></i>
+                        </a>
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- End Logo -->
+                    <!-- ============================================================== -->
+                    <div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
+                        <!-- ============================================================== -->
+                        <!-- toggle and nav items -->
+                        <!-- ============================================================== -->
+                        @*<ul class="navbar-nav float-start me-auto">
+                            <!-- ============================================================== -->
+                            <!-- Search -->
+                            <!-- ============================================================== -->
+                            <li class="nav-item search-box">
+                                <a class="nav-link waves-effect waves-dark"
+                                   href="javascript:void(0)"><i class="ti-search"></i></a>
+                                <form class="app-search position-absolute">
+                                    <input type="text" class="form-control" placeholder="Search &amp; enter"> <a class="srh-btn"><i class="ti-close"></i></a>
+                                </form>
+                            </li>
+                        </ul>*@
+                        <!-- ============================================================== -->
+                        <!-- Right side toggle and nav items -->
+                        <!-- ============================================================== -->
+                        <ul class="navbar-nav float-end">
+                            <!-- ============================================================== -->
+                            <!-- User profile and search -->
+                            <!-- ============================================================== -->
+                            <li class="nav-item dropdown float-end">
+                                @if (User.IsInRole(Roles.User))
+                                {
+                                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" id="Userdd" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @User.Identity?.Name
+                                        <img src="~/images/users/1.jpg" alt="user" class="rounded-circle" width="31">
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
+                                        <!-- Place inside Roles.User-->
+                                        <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="Create">
+                                            <i class="fa-solid fa-door-open"></i><span class="hide-menu">Apply for Leave</span>
+                                        </a>
+                                        <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="MyLeave">
+                                            <i class="fa-solid fa-user"></i><span class="hide-menu">My Leave</span>
+                                        </a>
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" class="btn d-block w-100 create-btn text-white no-block d-flex align-items-center">
+                                                <i class="fa-solid fa-power-off"></i>
+                                                <span class="hide-menu m-l-5">Logout</span>
+                                            </button>
+                                        </form>
+                                    </ul>
+                                }
+                                @if (User.IsInRole(Roles.Administrator))
+                                {
+                                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" id="Userdd" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @User.Identity?.Name
+                                        <img src="~/images/users/1.jpg" alt="user" class="rounded-circle" width="31">
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item waves-effect waves-dark" aria-expanded="false" asp-area="" asp-controller="Employees" asp-action="Index">
+                                            <span class="hide-menu"><i class="fa-solid fa-users"></i></span>
+                                        </a>
+                                        <a class="dropdown-item waves-effect waves-dark" aria-expanded="false" asp-area="" asp-controller="LeaveTypes" asp-action="Index">
+                                            <span class="hide-menu"><i class="fa-solid fa-gears"></i></span>
+                                        </a>
+                                        <a class="dropdown-item waves-effect waves-dark" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="Index">
+                                            <span class="hide-menu"><i class="fa-solid fa-list-check"></i></span>
+                                        </a>
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" class="btn d-block w-100 create-btn text-white no-block d-flex align-items-center">
+                                                <i class="fa-solid fa-power-off"></i>
+                                                <span class="hide-menu m-l-5">Logout</span>
+                                            </button>
+                                        </form>
+                                    </ul>
+                                }
+                            </li>
+                            <!-- ============================================================== -->
+                            <!-- User profile and search -->
+                            <!-- ============================================================== -->
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <!-- ============================================================== -->
+            <!-- End Topbar header -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Left Sidebar - style you can find in sidebar.scss  -->
+            <!-- ============================================================== -->
+            <aside class="left-sidebar" data-sidebarbg="skin6">
+                <!-- Sidebar scroll-->
+                <div class="scroll-sidebar">
+                    <!-- Sidebar navigation-->
+                    <nav class="sidebar-nav">
+                        <ul id="sidebarnav">
+                            <!-- User Profile-->
+                            <li>
+                                <!-- User Profile-->
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <div class="user-profile d-flex no-block dropdown m-t-20">
+                                        <div class="user-pic">
+                                            <img src="~/images/users/1.jpg" alt="users"
+                                         class="rounded-circle" width="40" />
+                                        </div>
+                                        <div class="user-content hide-menu m-l-10">
+                                            <a href="#" class="" id="Userdd" role="button"
+                                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <h5 class="m-b-0 user-name font-medium">
+                                                    @User.Identity?.Name
+                                                </h5>
+                                                <span class="op-5 user-email">
+                                                    @User.FindFirstValue(ClaimTypes.Role)
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <li class="p-15 m-t-10">
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" class="btn d-block w-100 create-btn text-white no-block d-flex align-items-center">
+                                            <i class="fa-solid fa-power-off"></i>
+                                                <span class="hide-menu m-l-5">Logout</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="p-2 m-t-2">
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" class="btn d-block w-100 btn-success text-white no-block d-flex align-items-center">
+                                            <i class="fa-solid fa-pen"></i>
+                                                <span class="hide-menu m-l-5">Register</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li class="p-2 m-t-2">
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" class="btn d-block w-100 btn-primary text-white no-block d-flex align-items-center">
+                                            <i class="fa-solid fa-right-to-bracket"></i>
+                                                <span class="hide-menu m-l-5">Login</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                            </li>
+                            <!-- End User Profile-->
+
+                            <!-- User Profile-->
+                            <li class="sidebar-item">
+                                <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="fa-solid fa-house"></i><span class="hide-menu">Home</span>
+                                </a>
+                            </li>
+
+                            @if (User.IsInRole(Roles.User))
+                            {
+                                <!-- Place inside Roles.User-->
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="Create">
+                                        <i class="fa-solid fa-door-open"></i><span class="hide-menu">Apply for Leave</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="MyLeave">
+                                        <i class="fa-solid fa-user"></i><span class="hide-menu">My Leave</span>
+                                    </a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole(Roles.Administrator))
+                            {
+                                <!-- Place inside Roles.Administrator -->
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="Employees" asp-action="Index">
+                                        <i class="fa-solid fa-users"></i><span class="hide-menu">Employees</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item dropdown">
+                                    <a class="sidebar-link dropdown-toggle text-muted waves-effect waves-dark sidebar-link" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-people-roof"></i><span class="hide-menu">Manage Leaves</span>
+                                    </a>
+                                    <ul class="sidebar-item dropdown-menu">
+                                        <li>
+                                            <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveTypes" asp-action="Index">
+                                                <i class="fa-solid fa-gears"></i><span class="hide-menu">Leave Types</span>
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="sidebar-link waves-effect waves-dark sidebar-link" aria-expanded="false" asp-area="" asp-controller="LeaveRequests" asp-action="Index">
+                                                <i class="fa-solid fa-list-check"></i><span class="hide-menu">Leave Requests</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                    <!-- End Sidebar navigation -->
+                </div>
+                <!-- End Sidebar scroll-->
+            </aside>
+            <!-- ============================================================== -->
+            <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Page wrapper  -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <div class="container-fluid">
+                    <div class="row">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+            <!-- ============================================================== -->
+            <!-- End Page wrapper  -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Wrapper -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- All Jquery -->
+        <!-- ============================================================== -->
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+        <!--Wave Effects -->
+        <script src="~/js/waves.js"></script>
+        <!--Menu sidebar -->
+        <script src="~/js/sidebarmenu.js"></script>
+        <!--Custom JavaScript -->
+        <script src="~/js/custom.js"></script>
+        <!--This page JavaScript -->
+        
+        <!--chartis chart-->
+        <!--<script src="../../dist/js/pages/dashboards/dashboard1.js"></script>-->
+        
+        <!-- Javascript for datatables Jquery UI and SweetAlert-->
+        <script>
+            $(function () {
+                /* DataTables.net */
+                $('.table').DataTable();
+                $('.datepicker').datepicker({
+                    dateFormat: "dd-mm-yy"
+                });
+            });
+        </script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+
+    </html>
+}
