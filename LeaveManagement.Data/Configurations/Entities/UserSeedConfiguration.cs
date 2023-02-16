@@ -6,7 +6,7 @@ using LeaveManagement.Common.Constants;
 namespace LeaveManagement.Data.Configurations.Entities;
 
 /* SETTING ADMIN USER FOR SYSTEM 
---------------------------------------------------------------------*/
+------------------------------*/
 
 public class UserSeedConfiguration : IEntityTypeConfiguration<Employee>
 {

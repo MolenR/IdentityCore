@@ -7,6 +7,10 @@ using LeaveManagement.Repository.Interfaces;
 using LeaveManagement.Repository.Repositories;
 using LeaveManagement.Repository.Configurations;
 using Serilog;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Configuration;
+using IdentityCore.Web.Services.Identity;
 
 namespace LeaveManagement.Web;
 
@@ -24,26 +28,52 @@ public class Program
             options.UseSqlServer(connectionString));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        /* SET EMPLOYEEs TO HAVE IDENTITYROLES 
-        --------------------------------------------------------------------------------------------------------------*/
-        builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-        builder.Services.AddControllersWithViews();
+        /* SET EMPLOYEE TO HAVE IDENTITYROLE 
+        ----------------------------------*/
+        builder.Services.AddDefaultIdentity<Employee>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
 
-        /* ADDED HTTP CONTEXT */
+            options.SignIn.RequireConfirmedAccount = true;
+        })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+
+            /* PASSWORD VALIDATION PIPELINE*/
+            .AddPasswordValidator<PasswordValidatorService>();
+        
+        builder.Services.AddControllersWithViews()/*.AddMvcOptions(options => options.Filters.Add(new AuthorizeFilter()))*/;
+
+        /* ADD AUTHENTICATION
+        -------------------*/
+        
+        /*builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        })
+            .AddCookie(cookie => cookie.LoginPath = " CUSTOM PATH GOES HERE ")*/
+
+        /* ADD THIRTH PARTY LOGIN
+        -----------------------*/
+        //.AddGoogle(google => { google.ClientId = Configuration["Google:ClientId"]; google.ClientSecret = Configuration["Google:ClientSecret"] })
+
+        /* ADDED HTTP CONTEXT 
+        -------------------*/
         builder.Services.AddHttpContextAccessor();
 
         /* CONFIGURE AUTOMAPPER
-        ----------------------------------------------------------------------------------------------------------------*/
+        ---------------------*/
         builder.Services.AddAutoMapper(typeof(MapperConfig));
 
         /* CONFIGURE SERILOG 
-        ----------------------------------------------------------------------------------------------------------------*/
+        ------------------*/
         builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
         /* IMPLEMENT EMAIL SERVICES WITH PAPERCUT 
-        ----------------------------------------------------------------------------------------------------------------*/
+        ---------------------------------------*/
         builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25, "no-reply@leavemanagement.com"));
 
         /* REGISTER MANUAL MADE REPOSITORIES 
@@ -78,6 +108,8 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 
