@@ -8,9 +8,6 @@ using LeaveManagement.Repository.Repositories;
 using LeaveManagement.Repository.Configurations;
 using Serilog;
 using IdentityCore.Web.Services.Identity;
-using LeaveManagement.Web.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 
 namespace LeaveManagement.Web;
 
@@ -55,6 +52,16 @@ public class Program
         ---------------------*/
         //.AddClaimsPrincipalFactory<CustomClaimService>();
 
+        /* ADD AUTHENTICATION
+        -------------------*/
+        builder.Services.AddAuthentication()
+            /* ADD THIRTH PARTY LOGIN
+            -----------------------*/
+            .AddGoogle(googleOptions => {
+                googleOptions.ClientId = builder.Configuration["Google:ClientId"];
+                googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"]; ;
+            });
+
         /* ADD POLICY AUTHORIZATION
         -------------------------*/
         /*builder.Services.AddAuthorization(auth =>
@@ -67,22 +74,17 @@ public class Program
                 policy.RequireClaim(EmployeeClaims.isMinimumAge, "true");
             });
         });*/
-        
-                                                  /* AUTHORIZATION GLOBAL */
-        builder.Services.AddControllersWithViews()/*.AddMvcOptions(options => options.Filters.Add(new AuthorizeFilter()))*/;
 
-        /* ADD AUTHENTICATION
-        -------------------*/
-        
+        /* ADD COOKIE AUTHENTICATION 
+        --------------------------*/
         /*builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         })
             .AddCookie(cookie => cookie.LoginPath = " CUSTOM PATH GOES HERE ")*/
 
-        /* ADD THIRTH PARTY LOGIN
-        -----------------------*/
-        //.AddGoogle(google => { google.ClientId = Configuration["Google:ClientId"]; google.ClientSecret = Configuration["Google:ClientSecret"] })
+                                                  /* AUTHORIZATION GLOBAL */
+        builder.Services.AddControllersWithViews()/*.AddMvcOptions(options => options.Filters.Add(new AuthorizeFilter()))*/;
 
         /* ADDED HTTP CONTEXT 
         -------------------*/
@@ -101,7 +103,7 @@ public class Program
         builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25, "no-reply@leavemanagement.com"));
 
         /* REGISTER MANUAL MADE REPOSITORIES 
-        ----------------------------------------------------------------------------------------------------------------*/
+        ----------------------------------*/
         /* WHILE INJECTION SCOPED IS TRANSIENT */
         builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         builder.Services.AddScoped<ILeaveTypeRepo, LeaveTypeRepo>();
