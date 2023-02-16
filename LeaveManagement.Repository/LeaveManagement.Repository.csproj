@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LeaveManagement.Data\IdentityCore.Data.csproj" />
+	  <ProjectReference Include="..\LeaveManagement.Data\LeaveManagement.Data.csproj" />
 	</ItemGroup>
 
 </Project>

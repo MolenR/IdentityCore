@@ -1,7 +1,5 @@
 ﻿using LeaveManagement.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Linq;
 
 namespace IdentityCore.Web.Services.Identity
 {

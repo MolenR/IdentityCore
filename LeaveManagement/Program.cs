@@ -7,9 +7,6 @@ using LeaveManagement.Repository.Interfaces;
 using LeaveManagement.Repository.Repositories;
 using LeaveManagement.Repository.Configurations;
 using Serilog;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Configuration;
 using IdentityCore.Web.Services.Identity;
 
 namespace LeaveManagement.Web;
