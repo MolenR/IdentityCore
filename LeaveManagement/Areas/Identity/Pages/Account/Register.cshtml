@@ -18,6 +18,14 @@
                 <span asp-validation-for="Input.FirstName" class="text-danger"></span>
             </div>
             <br />
+            @*<div class="form-floating mb-3">
+                <label asp-for="Input.Role"></label>
+                    <select class="form-control" asp-items="Model.Input.Roles" asp-for="Input.Role">
+                        <option>--- Select Role ---</option>
+                    </select>    
+                <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>*@
+            <br />
             <div class="form-floating mb-3">
                 <input asp-for="Input.LastName" class="form-control" aria-required="true"/>
                 <label asp-for="Input.LastName">Last Name</label>

@@ -14,9 +14,12 @@ public class ApplicationDbContext : IdentityDbContext<Employee>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.ApplyConfiguration(new RoleSeedConfiguration());
+
+        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+        /*builder.ApplyConfiguration(new RoleSeedConfiguration());
         builder.ApplyConfiguration(new UserSeedConfiguration());
-        builder.ApplyConfiguration(new UserRoleSeedConfiguration());
+        builder.ApplyConfiguration(new UserRoleSeedConfiguration());*/
     }
 
     /* AUTOMATE AUDITING ON DB RECORDS */

@@ -8,6 +8,9 @@ using LeaveManagement.Repository.Repositories;
 using LeaveManagement.Repository.Configurations;
 using Serilog;
 using IdentityCore.Web.Services.Identity;
+using LeaveManagement.Web.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace LeaveManagement.Web;
 
@@ -18,7 +21,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         /* Add services to the container. 
-        --------------------------------------------------------------------------------------------------------------*/
+        -------------------------------*/
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         
@@ -39,7 +42,7 @@ public class Program
             options.SignIn.RequireConfirmedAccount = true;
 
             options.Lockout.AllowedForNewUsers = true;
-            options.Lockout.DefaultLockoutTimeSpan= TimeSpan.FromMinutes(1);
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
             options.Lockout.MaxFailedAccessAttempts = 3;
         })
             .AddRoles<IdentityRole>()
@@ -47,7 +50,25 @@ public class Program
 
             /* PASSWORD VALIDATION PIPELINE*/
             .AddPasswordValidator<PasswordValidatorService>();
+
+        /* ADD CLAIMS PRINCIPAL
+        ---------------------*/
+        //.AddClaimsPrincipalFactory<CustomClaimService>();
+
+        /* ADD POLICY AUTHORIZATION
+        -------------------------*/
+        /*builder.Services.AddAuthorization(auth =>
+        {
+            auth.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+
+            auth.AddPolicy(Policies.IsMinimumAge, policy => {
+                policy.RequireClaim(EmployeeClaims.isMinimumAge, "true");
+            });
+        });*/
         
+                                                  /* AUTHORIZATION GLOBAL */
         builder.Services.AddControllersWithViews()/*.AddMvcOptions(options => options.Filters.Add(new AuthorizeFilter()))*/;
 
         /* ADD AUTHENTICATION

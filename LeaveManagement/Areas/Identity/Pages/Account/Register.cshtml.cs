@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace LeaveManagement.Areas.Identity.Pages.Account
@@ -19,6 +20,7 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<Employee> _signInManager;
+        //private readonly RoleManager<Employee> _rolesManager;
         private readonly UserManager<Employee> _userManager;
         private readonly IUserStore<Employee> _userStore;
         private readonly IUserEmailStore<Employee> _emailStore;
@@ -27,17 +29,19 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
 
         public RegisterModel(
             UserManager<Employee> userManager,
-            IUserStore<Employee> userStore,
             SignInManager<Employee> signInManager,
+            //RoleManager<Employee> rolesManager,
+            IUserStore<Employee> userStore,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
+            //_rolesManager = rolesManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
-            _signInManager = signInManager;
-            _logger = logger;
             _emailSender = emailSender;
+            _logger = logger;
         }
 
         /// <summary>
@@ -73,6 +77,11 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+
+            /*public SelectList Roles { get; set; }
+
+            [Required]
+            public string Role { get; set; }*/
 
             [Required]
             [Display(Name = "First Name")]
@@ -112,6 +121,10 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            /* LIST OF USER ROLES
+            -------------------*/
+            //Input = new() { Roles = new(_rolesManager.Roles.ToList(), "Name", "Name") };
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -137,10 +150,18 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    /* ADD ROLE TO NEW USER 
+                    ---------------------*/
                     await _userManager.AddToRoleAsync(user, Roles.User);
+                    //await _userManager.AddToRoleAsync(user, Input.Role);
+
                     var userId = await _userManager.GetUserIdAsync(user);
+                    
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
@@ -167,6 +188,9 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
+            //Input.Roles = new SelectList(_rolesManager.Roles.ToList(), "Name", "Name");
+
+
             return Page();
         }
 
