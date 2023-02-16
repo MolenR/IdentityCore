@@ -37,6 +37,10 @@ public class Program
             options.Password.RequireUppercase = true;
 
             options.SignIn.RequireConfirmedAccount = true;
+
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.DefaultLockoutTimeSpan= TimeSpan.FromMinutes(1);
+            options.Lockout.MaxFailedAccessAttempts = 3;
         })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

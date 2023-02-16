@@ -91,18 +91,14 @@
                         <!-- ============================================================== -->
                         <!-- toggle and nav items -->
                         <!-- ============================================================== -->
-                        @*<ul class="navbar-nav float-start me-auto">
+                        <ul class="navbar-nav float-start me-auto">
                             <!-- ============================================================== -->
                             <!-- Search -->
                             <!-- ============================================================== -->
-                            <li class="nav-item search-box">
-                                <a class="nav-link waves-effect waves-dark"
-                                   href="javascript:void(0)"><i class="ti-search"></i></a>
-                                <form class="app-search position-absolute">
-                                    <input type="text" class="form-control" placeholder="Search &amp; enter"> <a class="srh-btn"><i class="ti-close"></i></a>
-                                </form>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50 waves-effect waves-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Welcome @User.Identity?.Name!</a>
                             </li>
-                        </ul>*@
+                        </ul>
                         <!-- ============================================================== -->
                         <!-- Right side toggle and nav items -->
                         <!-- ============================================================== -->

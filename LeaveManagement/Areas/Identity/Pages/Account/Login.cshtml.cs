@@ -8,18 +8,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using LeaveManagement.Data;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace LeaveManagement.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly SignInManager<Employee> _signInManager;
+        private readonly UserManager<Employee> _userManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IEmailSender _emailSender;
 
-        public LoginModel(SignInManager<Employee> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<Employee> signInManager, 
+            UserManager<Employee> userManager,
+            ILogger<LoginModel> logger, 
+            IEmailSender emailSender
+            )
         {
             _signInManager = signInManager;
+            _userManager = userManager;
             _logger = logger;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -105,21 +114,33 @@ namespace LeaveManagement.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
+                
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
                 }
+                
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
+                    var user = await _userManager.FindByNameAsync(Input.Email);
+
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Account Locked Out. To Many Invalid Tries",
+                        $"Your Account {user.Email } Is Locked. Please Reset Password");
+
+                    ModelState.AddModelError("", "Account Locked. Reset Password");
+                    return RedirectToPage("./ForgotPassword");
                 }
+                
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
